@@ -1,59 +1,42 @@
 from django.shortcuts import render
-
 from .models import Person
 
 from .serializers import PersonSerializer
 from rest_framework import generics
+from rest_framework.response import Response
 
 # Create your views here.
 class CreatePerson(generics.CreateAPIView):
-    def get(self, request):
+    serializer_class = PersonSerializer
+    def post(self, request):
         serializer = PersonSerializer(data = request.data)
         serializer.is_valid(raise_exception=True)
-        
-        self.name = serializer.validated_data['name']
-        self.country_residence = serializer.validated_data['country_residence']
-        self.state_residence = serializer.validated_data['state_residence']
-        
-        person = Person(name = self.name, country_residence= self.country_residence, state_residence= self.state_residence)
-        person.save()
-        return person
+        try:
+            Person.objects.get(name = request.data['name'])
+        except Person.DoesNotExist:
+            serializer.create(validated_data=request.data)
+            return Response(serializer.validated_data)
+        else:
+            return Response("This user exist in our database")
         
 class ReadUpdateDeletePerson(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = PersonSerializer
     def get(self, request):
-        serializer_class = PersonSerializer(data = request.data)
-        serializer_class.is_valid(raise_exception=True)
-        
-        self.name = serializer.validated_data['name']
-        self.country_residence = serializer.validated_data['country_residence']
-        self.state_residence = serializer.validated_data['state_residence']
-        
-        
-        
-        return person
+        try:
+            person = Person.objects.get(name = request.query_params['name'])
+            serializer_class = PersonSerializer(person)
+            return Response(serializer_class.data['name'])
+        except:
+            return Response("Invalid/Incomplete query parameter")
     
     def put(self, request):
-        serializer_class = PersonSerializer(data = request.data)
-        serializer_class.is_valid(raise_exception=True)
-        
-        self.name = serializer.validated_data['name']
-        self.country_residence = serializer.validated_data['country_residence']
-        self.state_residence = serializer.validated_data['state_residence']
-        
-        person = Person(name = self.name, country_residence= self.country_residence, state_residence= self.state_residence)
-        person.save()
-        
-        return person
+        serializer = PersonSerializer(data = request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.update(instance=request.query_params, validated_data=request.data)
+        return Response(serializer.validated_data)
     
     def delete(self, request):
-        serializer_class = PersonSerializer(data = request.data)
-        serializer_class.is_valid(raise_exception=True)
-        
-        self.name = serializer.validated_data['name']
-        self.country_residence = serializer.validated_data['country_residence']
-        self.state_residence = serializer.validated_data['state_residence']
-        
-        person = Person(name = self.name, country_residence= self.country_residence, state_residence= self.state_residence)
-        person.save()
-        
-        return person
+        person = Person.objects.get(name = request.query_params['name'])
+        serializer_class = PersonSerializer(person)
+        serializer_class.delete(validated_data=person)
+        return Response("Deleted")
