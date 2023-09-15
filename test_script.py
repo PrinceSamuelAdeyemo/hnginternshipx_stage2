@@ -28,4 +28,13 @@ def delete_user(user_id):
         r = requests.delete(f'http://127.0.0.1:8000/api/{user_id}')
         return r.text
         
-print(update_user("Essien"))
+print(create_user("Mike Obi"))
+
+
+def validate_strings(input):
+    accepted_strings = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz "
+    for i in input:
+        if (i not in accepted_strings):
+            raise Error(" is not a string", params={"value": i})
+         
+#validate_strings('Micheal Essien')

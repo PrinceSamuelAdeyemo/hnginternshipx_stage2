@@ -3,19 +3,15 @@ from django.core.exceptions import ValidationError
 # Create your models here.
 
 def validate_strings(input):
-    alpha = "1Hello"
-    number_dict = []
+    accepted_strings = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz "
     for i in input:
-        try:
-            print("Int:",int(i))
-            number_dict.append(int(i))
-        except ValueError:
-            continue
+        if (i not in accepted_strings):
+            raise ValidationError(" is not a string", params={"value": i})
+        
+    return 'INVALID'
             
-    if (number_dict != []):
-        print("numbers present")
 class Person(models.Model):
-    name = models.CharField(max_length=256)
+    name = models.CharField(max_length=256, validators=[validate_strings])
     
     def __str__(self):
         return self.name

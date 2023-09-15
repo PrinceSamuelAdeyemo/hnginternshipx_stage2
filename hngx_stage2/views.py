@@ -9,16 +9,22 @@ from rest_framework.response import Response
 class CreatePerson(generics.CreateAPIView):
     serializer_class = PersonSerializer
     def post(self, request):
-        print(type(request.data['name']))
         serializer = PersonSerializer(data = request.data)
-        serializer.is_valid(raise_exception=True)
+        
+        
         try:
             Person.objects.get(name = request.data['name'])
-        except Person.DoesNotExist:
-            serializer.create(validated_data=request.data)
-            return Response(serializer.validated_data)
-        else:
             return Response("This user exist in our database")
+        except Person.DoesNotExist:
+            try:
+                serializer.is_valid(raise_exception=True)
+                serializer.create(validated_data=request.data)
+                return Response(serializer.validated_data)
+            except:
+                return Response("Check your input, must be string, no other datatype is allowed")
+                
+        else:
+            return Response((serializer.errors ,"Can't save, check your input"))
         
 class ReadUpdateDeletePerson(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PersonSerializer
