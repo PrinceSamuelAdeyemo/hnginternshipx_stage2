@@ -1,4 +1,5 @@
 import requests
+import re
 
 # POST request to the API
 def create_user(user_id):
@@ -28,13 +29,30 @@ def delete_user(user_id):
         r = requests.delete(f'http://127.0.0.1:8000/api/{user_id}')
         return r.text
         
-print(create_user("Mike Obi"))
+print(create_user("Mie Ob7i"))
 
-
+'''
 def validate_strings(input):
-    accepted_strings = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz "
+    accepted_strings = r'^[a-zA-Z]+( [a-zA-Z]+)?$'
+    if re.findall(accepted_strings, input):
+        raise serializers.ValidationError("not a string") 
+#validate_strings('Micheal Essien')
+'''
+"""
+
+accepted_strings = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz "
     for i in input:
         if (i not in accepted_strings):
             raise Error(" is not a string", params={"value": i})
-         
-#validate_strings('Micheal Essien')
+
+def check(input):
+    #accepted_strings = r"[a-zA-Z]+[]?[a-zA-Z]+"
+    accepted_strings = r'^[a-zA-Z]+( [a-zA-Z]+)?$'
+    if re.findall(accepted_strings, input):
+        return  "Match"
+    else:
+        return "Doesn't match"
+    
+print(check("Samues sw"))
+"""
+

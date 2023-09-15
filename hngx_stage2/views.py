@@ -5,13 +5,13 @@ from .serializers import PersonSerializer
 from rest_framework import generics
 from rest_framework.response import Response
 
+import re
+
 # Create your views here.
 class CreatePerson(generics.CreateAPIView):
     serializer_class = PersonSerializer
     def post(self, request):
         serializer = PersonSerializer(data = request.data)
-        
-        
         try:
             Person.objects.get(name = request.data['name'])
             return Response("This user exist in our database")

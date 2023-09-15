@@ -2,14 +2,9 @@ from rest_framework import serializers
 from rest_framework.response import Response
 from .models import Person
 
+import re
 
-def validate_strings(input):
-    accepted_strings = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz "
-    for i in input:
-        if (i not in accepted_strings):
-            raise serializers.ValidationError("%(i)s is not a string", params={"value": i})
-            
-            
+
 class PersonSerializer(serializers.ModelSerializer):
     
     class Meta:
