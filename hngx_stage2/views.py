@@ -9,6 +9,7 @@ from rest_framework.response import Response
 class CreatePerson(generics.CreateAPIView):
     serializer_class = PersonSerializer
     def post(self, request):
+        print(type(request.data['name']))
         serializer = PersonSerializer(data = request.data)
         serializer.is_valid(raise_exception=True)
         try:
@@ -21,22 +22,26 @@ class CreatePerson(generics.CreateAPIView):
         
 class ReadUpdateDeletePerson(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PersonSerializer
-    def get(self, request):
+    def get(self, request, pk):
         try:
-            person = Person.objects.get(name = request.query_params['name'])
+            person = Person.objects.get(name = pk)
+            #person = Person.objects.get(name = request.query_params['name'])
             serializer_class = PersonSerializer(person)
             return Response(serializer_class.data['name'])
         except:
             return Response("Invalid/Incomplete query parameter")
     
-    def put(self, request):
-        serializer = PersonSerializer(data = request.data)
+    def put(self, request, pk):
+        serializer = PersonSerializer(instance = pk, data = request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.update(instance=request.query_params, validated_data=request.data)
+        serializer.update(instance=pk, validated_data=request.data)
         return Response(serializer.validated_data)
     
-    def delete(self, request):
-        person = Person.objects.get(name = request.query_params['name'])
-        serializer_class = PersonSerializer(person)
-        serializer_class.delete(validated_data=person)
-        return Response("Deleted")
+    def delete(self, request, pk):
+        try:
+            person = Person.objects.get(name = pk)
+            serializer_class = PersonSerializer(person)
+            serializer_class.delete(validated_data=person)
+            return Response("Deleted")
+        except:
+            return Response("Invalid/Incomplete query parameter")
